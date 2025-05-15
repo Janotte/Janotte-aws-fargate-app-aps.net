@@ -23,6 +23,10 @@ infra/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
+│   ├── ecr_repository/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
 │   ├── ecs_service/
 │   │   ├── main.tf
 │   │   ├── variables.tf
@@ -35,15 +39,11 @@ infra/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
-│   ├── iam_roles/
+│   ├── github_connection/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
-│   ├── networking/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│   ├── routes/
+│   ├── iam/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
@@ -55,7 +55,7 @@ infra/
 │   │   ├── main.tf
 │   │   ├── variables.tf
 │   │   └── outputs.tf
-│   └── vpn/
+│   └── vpc/
 │       ├── main.tf
 │       ├── variables.tf
 │       └── outputs.tf

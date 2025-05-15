@@ -1,0 +1,8 @@
+Site/bin/
+Site/obj/
+Terraform/
+*.md
+*.user
+*.suo
+.vscode/
+.git/
