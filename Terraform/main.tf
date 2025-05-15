@@ -20,3 +20,17 @@ module "containers_security_group" {
   project             = var.project
   environment         = var.environment
 }
+
+# Criando o Application Load Balancer, associando as subnets e grupo de segurança
+module "alb" {
+  source            = "./modules/alb"
+  alb_name          = "${var.project}-${var.environment}-alb"
+  subnets           = [module.main.public_subnet_a_id, module.main.public_subnet_b_id]
+  security_groups   = [module.containers_security_group.containers_sg_id]
+  vpc_id            = module.main.vpc_id
+  target_group_name = "${var.project}-${var.environment}-tg"
+  target_group_port = 80
+  health_check_path = "/"
+  project           = var.project
+  environment       = var.environment
+}
