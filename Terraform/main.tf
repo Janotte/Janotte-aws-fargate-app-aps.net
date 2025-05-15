@@ -58,3 +58,10 @@ module "github_connection" {
   provider_type = "GitHub"
 }
 
+# Criando um repositório ECR 
+module "ecr_repository" {
+  source          = "./modules/ecr_repository"
+  repository_name = "${var.project}-${var.environment}-ecr-repository"
+  project         = var.project
+  environment     = var.environment
+}
