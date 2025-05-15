@@ -42,3 +42,11 @@ module "fargate_cluster" {
   project      = var.project
   environment  = var.environment
 }
+
+# Criando o bucket s3 para os artefatos do build
+module "artifacts_bucket" {
+  source      = "./modules/s3_artifacts"
+  bucket_name = "${var.project}-${var.environment}-artifacts.${var.domain}"
+  environment = var.environment
+  project     = var.project
+}
