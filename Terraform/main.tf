@@ -53,9 +53,9 @@ module "artifacts_bucket" {
 
 # Criando a conexão com o GitHub
 module "github_connection" {
-  source = "./modules/github_connection"
-  connection_name   = "${var.project}-${var.environment}-github-connection"
-  provider_type = "GitHub"
+  source          = "./modules/github_connection"
+  connection_name = "${var.project}-${var.environment}-github-connection"
+  provider_type   = "GitHub"
 }
 
 # Criando um repositório ECR 
