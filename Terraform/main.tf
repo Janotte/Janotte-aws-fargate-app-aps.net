@@ -34,3 +34,11 @@ module "alb" {
   project           = var.project
   environment       = var.environment
 }
+
+# Criando o cluster ECS Fargate
+module "fargate_cluster" {
+  source       = "./modules/fargate"
+  fargate_name = "${var.project}-${var.environment}-cluster"
+  project      = var.project
+  environment  = var.environment
+}
