@@ -37,7 +37,7 @@ variable "github_owner" {
 variable "github_repo" {
   type        = string
   description = "Repositório no GitHub"
-  default     = "Janotte-aws-fargate-app-aps.net"
+  default     = "site-aws-fargate-app-aps.net"
 }
 
 variable "account_id" {
