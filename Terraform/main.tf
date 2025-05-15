@@ -50,3 +50,11 @@ module "artifacts_bucket" {
   environment = var.environment
   project     = var.project
 }
+
+# Criando a conexão com o GitHub
+module "github_connection" {
+  source = "./modules/github_connection"
+  connection_name   = "${var.project}-${var.environment}-github-connection"
+  provider_type = "GitHub"
+}
+
