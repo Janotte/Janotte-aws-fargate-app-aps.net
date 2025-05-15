@@ -65,3 +65,33 @@ module "ecr_repository" {
   project         = var.project
   environment     = var.environment
 }
+
+# Criando a Role para o CodeBuild
+module "iam" {
+  source            = "./modules/iam"
+  codebuild_role_name    = "${var.project}-${var.environment}-codebuild-role"
+  codebuild_policy_name  = "${var.project}-${var.environment}-codebuild-policy"
+}
+
+# Criando o CodeBuild
+module "codebuild" {
+  source                  = "./modules/codebuild"
+  codebuild_name          = "${var.project}-${var.environment}-codebuild"
+  codebuild_role_arn      = module.iam.codebuild_role_arn
+  github_owner            = var.github_owner
+  github_repo             = var.github_repo
+  artifact_bucket         = module.artifacts_bucket.bucket_name
+  artifact_path           = ""
+  codestar_connection_arn = module.github_connection.codestar_connection_arn
+  environment_variables = [
+    { name = "AWS_REGION", value = "${var.region}" },
+    { name = "AWS_ACCOUNT_ID", value = "${var.account_id}" },
+    { name = "IMAGE_REPO_NAME", value = "${module.ecr_repository.ecr_repository_name}" },
+    { name = "CONTAINER_NAME", value = "${module.fargate_cluster.cluster_name}" },
+    { name = "ASPNETCORE_ENVIRONMENT", value = "Production" },
+    { name = "Project", value = "${var.project}" },
+    { name = "Environment", value = "${var.environment}" }
+  ]
+  project     = var.project
+  environment = var.environment
+}
