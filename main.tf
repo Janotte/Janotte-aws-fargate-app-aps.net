@@ -71,6 +71,7 @@ module "iam" {
   source            = "./modules/iam"
   codebuild_role_name    = "${var.project}-${var.environment}-codebuild-role"
   codebuild_policy_name  = "${var.project}-${var.environment}-codebuild-policy"
+  ecs_task_execution_role_name = "${var.project}-${var.environment}-ecs-task-execution-role"
 }
 
 # Criando o CodeBuild
@@ -94,4 +95,16 @@ module "codebuild" {
   ]
   project     = var.project
   environment = var.environment
+}
+
+# Criando Task Definition com imagem e role
+module "ecs_task_definition" {
+  source             = "./modules/ecs_task_definition"
+  family_name        = "${var.project}-${var.environment}-fargate-task"
+  cpu                = "256"
+  memory             = "512"
+  container_image    = module.ecr_repository.ecr_image_url
+  execution_role_arn = module.iam.ecs_execution_role_arn
+  project            = var.project
+  environment        = var.environment
 }
