@@ -11,3 +11,12 @@ module "main" {
   project               = var.project
   environment           = var.environment
 }
+
+# Criando um grupo de segurança para containers
+module "containers_security_group" {
+  source              = "./modules/security_groups"
+  security_group_name = "${var.project}-${var.environment}-containers-sg"
+  vpc_id              = module.main.vpc_id
+  project             = var.project
+  environment         = var.environment
+}
