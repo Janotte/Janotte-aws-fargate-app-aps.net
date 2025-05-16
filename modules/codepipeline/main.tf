@@ -9,10 +9,8 @@ resource "aws_codepipeline" "codepipeline" {
 
   stage {
     name = "Source"
-
-
     action {
-      name             = "GitHub_Source"
+      name             = "Source"
       category         = "Source"
       owner            = "AWS"
       provider         = "CodeStarSourceConnection"
@@ -20,11 +18,11 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn        = var.codestar_connection_arn
-        FullRepositoryId     = "${var.github_owner}/${var.github_repo}"
-        BranchName           = var.github_branch
-        OutputArtifactFormat = "CODE_ZIP"
+        ConnectionArn      = var.codestar_connection_arn
+        FullRepositoryId = "https://github.com/${var.github_owner}/${var.github_repo}"
+        BranchName         = var.github_branch
       }
+
     }
   }
 
@@ -38,9 +36,9 @@ resource "aws_codepipeline" "codepipeline" {
       category         = "Build"
       owner            = "AWS"
       provider         = "CodeBuild"
-      version          = "1"
       input_artifacts  = ["source_output"]
       output_artifacts = ["build_output"]
+      version          = "1"
 
       configuration = {
         ProjectName = var.codebuild_project_name
@@ -56,8 +54,8 @@ resource "aws_codepipeline" "codepipeline" {
       category        = "Deploy"
       owner           = "AWS"
       provider        = "ECS"
-      version         = "1"
       input_artifacts = ["build_output"]
+      version         = "1"
 
       configuration = {
         ClusterName = var.ecs_cluster_name

@@ -3,8 +3,7 @@ variable "connection_name" {
   type        = string
 }
 
-variable "provider_type" {
-  description = "Tipo de provedor da conexão"
+variable "github_provider" {
+  description = "Tipo de provedor da conexão do GitHub"
   type        = string
-  default     = "GitHub"
 }

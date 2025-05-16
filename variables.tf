@@ -50,5 +50,10 @@ variable "github_branch" {
   type        = string
   description = "Branch do repositório"
   default     = "main"
-  
+}
+
+variable "github_provider" {
+  description = "Tipo de provedor da conexão"
+  type        = string
+  default     = "GitHub"
 }

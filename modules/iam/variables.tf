@@ -32,7 +32,13 @@ variable "codepipeline_role_name" {
   description = "Nome da role do CodePipeline"
   type        = string
 }
+
 variable "codestar_connection_arn" {
   description = "ARN da conexão do CodeStar"
+  type        = string
+}
+
+variable "bucket_arn" {
+  description = "ARN do bucket S3 para os artefatos"
   type        = string
 }

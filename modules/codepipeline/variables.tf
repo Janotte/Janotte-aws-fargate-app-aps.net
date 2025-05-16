@@ -7,10 +7,16 @@ variable "environment" {
   description = "Ambiente da Aplicação"
   type        = string
 }
+
+variable "region" {
+  description = "Região AWS"
+  type        = string
+}
+
 variable "codepipeline_name" {
   description = "Nome do CodePipeline"
   type        = string
-} 
+}
 
 variable "codepipeline_role_arn" {
   description = "ARN da role usada pelo CodePipeline"
@@ -56,5 +62,3 @@ variable "github_branch" {
   description = "Branch a ser monitorado"
   default     = "main"
 }
-
-

@@ -103,20 +103,22 @@ resource "aws_iam_role_policy_attachment" "ecs_ecr_pull" {
 }
 
 # Role para CodePipeline
+data "aws_iam_policy_document" "codepipeline_assume_role_policy" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["codepipeline.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
+
 resource "aws_iam_role" "codepipeline_role" {
   name               = var.codepipeline_role_name
   assume_role_policy = data.aws_iam_policy_document.codepipeline_assume_role_policy.json
 }
 
-data "aws_iam_policy_document" "codepipeline_assume_role_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["codepipeline.amazonaws.com"]
-    }
-  }
-}
 
 resource "aws_iam_role_policy" "codepipeline_inline_policy" {
   name = var.codepipipeline_policy_name
@@ -127,22 +129,38 @@ resource "aws_iam_role_policy" "codepipeline_inline_policy" {
     Statement = [
       {
         Effect = "Allow",
+
         Action = [
-          "s3:*",
-          "codebuild:*",
-          "iam:PassRole",
-          "ecs:*",
-          "codedeploy:*",
-          "cloudwatch:*"
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:GetBucketVersioning",
+          "s3:PutObjectAcl",
+          "s3:PutObject",
+        ],
+
+        Resource = [
+          var.bucket_arn,
+          "${var.bucket_arn}/*"
+        ]
+      }
+    ]
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          ["codestar-connections:UseConnection"]
+        ],
+        Resource = [var.codestar_connection_arn]
+      }
+    ]
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "codebuild:BatchGetBuilds",
+          "codebuild:StartBuild",
         ],
         Resource = "*"
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "codestar-connections:UseConnection"
-        ],
-        "Resource" : "${var.codestar_connection_arn}"
       }
     ]
   })
