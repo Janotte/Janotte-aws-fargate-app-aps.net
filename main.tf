@@ -71,7 +71,12 @@ module "iam" {
   source            = "./modules/iam"
   codebuild_role_name    = "${var.project}-${var.environment}-codebuild-role"
   codebuild_policy_name  = "${var.project}-${var.environment}-codebuild-policy"
+  codedeploy_role_name = "${var.project}-${var.environment}-codedeploy-role"
+  codedeploy_policy_name = "${var.project}-${var.environment}-codedeploy-policy" 
+  codepipeline_role_name = "${var.project}-${var.environment}-codepipeline-role"
+  codepipipeline_policy_name =  "${var.project}-${var.environment}-codepipeline-policy"
   ecs_task_execution_role_name = "${var.project}-${var.environment}-ecs-task-execution-role"
+  codestar_connection_arn = module.github_connection.codestar_connection_arn
 }
 
 # Criando o CodeBuild
@@ -122,4 +127,26 @@ module "ecs_service" {
   target_group_arn    = module.alb.target_group_arn
   alb_listener_arn    = module.alb.listener_arn
   project             = var.project
+}
+
+# Criando o CodePipeline
+module "codepipeline" {
+  source      = "./modules/codepipeline"
+  codepipeline_name = "${var.project}-${var.environment}-codepipeline"
+  codepipeline_role_arn  = module.iam.codepipeline_role_arn
+
+  artifact_bucket        = module.artifacts_bucket.bucket_name
+
+  codestar_connection_arn = module.github_connection.codestar_connection_arn
+  github_owner  = var.github_owner
+  github_repo   = var.github_repo
+  github_branch = var.github_branch
+
+  codebuild_project_name = module.codebuild.codebuild_project_name
+
+  ecs_cluster_name       = module.fargate_cluster.cluster_name
+  ecs_service_name       = module.ecs_service.service_name
+  
+  project     = var.project
+  environment = var.environment
 }

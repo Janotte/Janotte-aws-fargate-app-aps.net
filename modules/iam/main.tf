@@ -55,3 +55,95 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_attach" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+
+# Role para CodeDeploy
+resource "aws_iam_role" "codedeploy_role" {
+  name               = var.codedeploy_role_name
+  assume_role_policy = data.aws_iam_policy_document.codedeploy_assume_role_policy.json
+}
+
+data "aws_iam_policy_document" "codedeploy_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["codedeploy.amazonaws.com", "ecs.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy" "codedeploy_inline_policy" {
+  name = var.codedeploy_role_name
+  role = aws_iam_role.codedeploy_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ecs:DescribeServices",
+          "ecs:DescribeTaskDefinition",
+          "ecs:UpdateService",
+          "ecs:RegisterTaskDefinition",
+          "elasticloadbalancing:*",
+          "autoscaling:*",
+          "codedeploy:*",
+          "cloudwatch:*"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_ecr_pull" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+# Role para CodePipeline
+resource "aws_iam_role" "codepipeline_role" {
+  name               = var.codepipeline_role_name
+  assume_role_policy = data.aws_iam_policy_document.codepipeline_assume_role_policy.json
+}
+
+data "aws_iam_policy_document" "codepipeline_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["codepipeline.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy" "codepipeline_inline_policy" {
+  name = var.codepipipeline_policy_name
+  role = aws_iam_role.codepipeline_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:*",
+          "codebuild:*",
+          "iam:PassRole",
+          "ecs:*",
+          "codedeploy:*",
+          "cloudwatch:*"
+        ],
+        Resource = "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "codestar-connections:UseConnection"
+        ],
+        "Resource" : "${var.codestar_connection_arn}"
+      }
+    ]
+  })
+}

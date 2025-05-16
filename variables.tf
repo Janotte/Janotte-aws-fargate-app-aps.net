@@ -45,3 +45,10 @@ variable "account_id" {
   description = "ID da conta aws"
   default     = "316713592474"
 }
+
+variable "github_branch" {
+  type        = string
+  description = "Branch do repositório"
+  default     = "main"
+  
+}
