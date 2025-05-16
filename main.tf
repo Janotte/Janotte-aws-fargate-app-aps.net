@@ -108,3 +108,18 @@ module "ecs_task_definition" {
   project            = var.project
   environment        = var.environment
 }
+
+# Criando o ECS Service com ALB e cluster
+module "ecs_service" {
+  source              = "./modules/ecs_service"
+  service_name        = "${var.project}-${var.environment}-ecs-service"
+  container_name = "${var.project}-${var.environment}-container"
+  cluster_id          = module.fargate_cluster.cluster_id
+  task_definition_arn = module.ecs_task_definition.task_definition_arn
+  desired_count       = 1
+  subnets             = [module.main.public_subnet_a_id, module.main.public_subnet_b_id]
+  security_group_id   = module.containers_security_group.containers_sg_id
+  target_group_arn    = module.alb.target_group_arn
+  alb_listener_arn    = module.alb.listener_arn
+  project             = var.project
+}
