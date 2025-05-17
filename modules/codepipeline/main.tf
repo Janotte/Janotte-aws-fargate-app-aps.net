@@ -19,9 +19,9 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn        = "arn:aws:codestar-connections:us-east-1:316713592474:connection/94f99e1d-a9cb-481f-8a45-e3f2be8127ce"
-        FullRepositoryId     = "Janotte/site-aws-fargate-app-aps.net"
-        BranchName           = "main"
+        ConnectionArn        = var.codestar_connection_arn
+        FullRepositoryId     = "${var.github_owner}/${var.github_repo}"
+        BranchName           = var.github_branch
         OutputArtifactFormat = "CODE_ZIP"
       }
     }

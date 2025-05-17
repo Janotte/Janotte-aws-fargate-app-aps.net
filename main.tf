@@ -96,7 +96,7 @@ module "codebuild" {
     { name = "AWS_ACCOUNT_ID", value = "${var.account_id}" },
     { name = "IMAGE_REPO_NAME", value = "${module.ecr_repository.ecr_repository_name}" },
     { name = "IMAGE_TAG", value = "latest" },
-    { name = "CONTAINER_NAME", value = "meusite-dev-container" },
+    { name = "CONTAINER_NAME", value = "${var.project}-${var.environment}-container" },
     { name = "ASPNETCORE_ENVIRONMENT", value = "Production" },
   ]
   project     = var.project
@@ -145,8 +145,8 @@ module "codepipeline" {
 
   codebuild_project_name = module.codebuild.codebuild_project_name
 
-  ecs_cluster_name = "meusite-dev-cluster"
-  ecs_service_name = "meusite-dev-ecs-service"
+  ecs_cluster_name = module.fargate_cluster.cluster_name
+  ecs_service_name = module.ecs_service.service_name
 
   region      = var.region
   project     = var.project
