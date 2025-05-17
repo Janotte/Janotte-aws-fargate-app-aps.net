@@ -152,3 +152,11 @@ module "codepipeline" {
   project     = var.project
   environment = var.environment
 }
+
+# Criando o certificado SSL
+module "meusite_cert" {
+  source       = "./modules/meusite_cert"
+  domain_name = "${var.project}.${var.domain}"
+  project      = var.project
+  environment  = var.environment
+}
