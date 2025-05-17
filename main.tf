@@ -172,7 +172,7 @@ module "alb_listener" {
 # Criando o alarme de 5xx do ALB
 module "alb_5xx_alarm" {
   source            = "./modules/cloud_watch/alb_5xx_alarm"
-  alarm_name        = "${var.project}-${var.environment}-alb-5xx-alarm"
+  alarm_name        = "Respostas HTTP 5xx no ALB"
   alarm_description = "Alarme para erros 5xx no ALB"
   alb_name       = module.alb.alb_name
 }
@@ -180,8 +180,17 @@ module "alb_5xx_alarm" {
 # Criando o alarme de CPU do ECS
 module "ecs_cpu_alarm" {
   source            = "./modules/cloud_watch/cpu_alarm"
-  alarm_name        = "${var.project}-${var.environment}-ecs-cpu-high"
+  alarm_name        = "Uso de CPU no ECS"
   alarm_description = "Uso de CPU acima de 80% no ECS"
+  cluster_name      = module.fargate_cluster.cluster_name
+  service_name      = module.ecs_service.service_name
+}
+
+# Criando o alarme de memória do ECS 
+module "ecs_memory_alarm" {
+  source            = "./modules/cloud_watch/memory_alarm"
+  alarm_name        = "Uso de memória no ECS"
+  alarm_description = "Uso de memória acima de 80% no ECS"
   cluster_name      = module.fargate_cluster.cluster_name
   service_name      = module.ecs_service.service_name
 }
