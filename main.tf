@@ -176,3 +176,12 @@ module "alb_5xx_alarm" {
   alarm_description = "Alarme para erros 5xx no ALB"
   alb_name       = module.alb.alb_name
 }
+
+# Criando o alarme de CPU do ECS
+module "ecs_cpu_alarm" {
+  source            = "./modules/cloud_watch/cpu_alarm"
+  alarm_name        = "${var.project}-${var.environment}-ecs-cpu-high"
+  alarm_description = "Uso de CPU acima de 80% no ECS"
+  cluster_name      = module.fargate_cluster.cluster_name
+  service_name      = module.ecs_service.service_name
+}
