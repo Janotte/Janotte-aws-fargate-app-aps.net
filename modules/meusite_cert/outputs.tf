@@ -7,3 +7,7 @@ output "dns_validation_records" {
     }
   ]
 }
+
+output "acm_certificate_arn" {  
+  value = aws_acm_certificate.meusite_cert.arn
+}

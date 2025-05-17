@@ -160,3 +160,11 @@ module "meusite_cert" {
   project      = var.project
   environment  = var.environment
 }
+
+# Criando o listener SSL
+module "alb_listener" {
+  source            = "./modules/alb_listener"
+  acm_certificate_arn = module.meusite_cert.acm_certificate_arn
+  alb_arn           = module.alb.alb_arn
+  target_group_arn  = module.alb.target_group_arn
+}
