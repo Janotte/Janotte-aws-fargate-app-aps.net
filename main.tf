@@ -70,12 +70,12 @@ module "ecr_repository" {
 # Criando a Role para o CodeBuild
 module "iam" {
   source                       = "./modules/iam"
-  codebuild_role_name          = "${var.project}-${var.environment}-codebuild-role"
-  codebuild_policy_name        = "${var.project}-${var.environment}-codebuild-policy"
-  codedeploy_role_name         = "${var.project}-${var.environment}-codedeploy-role"
-  codedeploy_policy_name       = "${var.project}-${var.environment}-codedeploy-policy"
-  codepipeline_role_name       = "${var.project}-${var.environment}-codepipeline-role"
-  codepipipeline_policy_name   = "${var.project}-${var.environment}-codepipeline-policy"
+  codebuild_role_name          = "${var.project}-${var.environment}-codebuild-service-role"
+  codebuild_policy_name        = "${var.project}-${var.environment}-codebuild-base-policy"
+  codedeploy_role_name         = "${var.project}-${var.environment}-codedeploy-service-role"
+  codedeploy_policy_name       = "${var.project}-${var.environment}-codedeploy-base-policy"
+  codepipeline_role_name       = "${var.project}-${var.environment}-codepipeline-service-role"
+  codepipipeline_policy_name   = "${var.project}-${var.environment}-codepipeline-base-policy"
   ecs_task_execution_role_name = "${var.project}-${var.environment}-ecs-task-execution-role"
   codestar_connection_arn      = module.github_connection.codestar_connection_arn
   bucket_arn                   = module.artifacts_bucket.bucket_arn
@@ -95,10 +95,9 @@ module "codebuild" {
     { name = "AWS_REGION", value = "${var.region}" },
     { name = "AWS_ACCOUNT_ID", value = "${var.account_id}" },
     { name = "IMAGE_REPO_NAME", value = "${module.ecr_repository.ecr_repository_name}" },
-    { name = "CONTAINER_NAME", value = "${module.fargate_cluster.cluster_name}" },
+    { name = "IMAGE_TAG", value = "latest" },
+    { name = "CONTAINER_NAME", value = "meusite-dev-container" },
     { name = "ASPNETCORE_ENVIRONMENT", value = "Production" },
-    { name = "Project", value = "${var.project}" },
-    { name = "Environment", value = "${var.environment}" }
   ]
   project     = var.project
   environment = var.environment
@@ -146,8 +145,8 @@ module "codepipeline" {
 
   codebuild_project_name = module.codebuild.codebuild_project_name
 
-  ecs_cluster_name = module.fargate_cluster.cluster_name
-  ecs_service_name = module.ecs_service.service_name
+  ecs_cluster_name = "meusite-dev-cluster"
+  ecs_service_name = "meusite-dev-ecs-service"
 
   region      = var.region
   project     = var.project

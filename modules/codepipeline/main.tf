@@ -5,6 +5,7 @@ resource "aws_codepipeline" "codepipeline" {
   artifact_store {
     location = var.artifact_bucket
     type     = "S3"
+
   }
 
   stage {
@@ -18,15 +19,13 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn      = var.codestar_connection_arn
-        FullRepositoryId = "https://github.com/${var.github_owner}/${var.github_repo}"
-        BranchName         = var.github_branch
+        ConnectionArn        = "arn:aws:codestar-connections:us-east-1:316713592474:connection/94f99e1d-a9cb-481f-8a45-e3f2be8127ce"
+        FullRepositoryId     = "Janotte/site-aws-fargate-app-aps.net"
+        BranchName           = "main"
+        OutputArtifactFormat = "CODE_ZIP"
       }
-
     }
   }
-
-
 
   stage {
     name = "Build"

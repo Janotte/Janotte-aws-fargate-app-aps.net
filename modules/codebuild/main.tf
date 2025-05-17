@@ -6,8 +6,8 @@ resource "aws_codebuild_project" "codebuild" {
   
   source {
     type = "GITHUB"
-    location = "https://github.com/${var.github_owner}/${var.github_repo}"
-  
+    location = "https://github.com/${var.github_owner}/${var.github_repo}.git"
+
     auth {
       type     = "OAUTH"
       resource = var.codestar_connection_arn

@@ -142,23 +142,31 @@ resource "aws_iam_role_policy" "codepipeline_inline_policy" {
           var.bucket_arn,
           "${var.bucket_arn}/*"
         ]
-      }
-    ]
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          ["codestar-connections:UseConnection"]
-        ],
-        Resource = [var.codestar_connection_arn]
-      }
-    ]
-    Statement = [
-      {
+      },
+       {
         Effect = "Allow",
         Action = [
           "codebuild:BatchGetBuilds",
           "codebuild:StartBuild",
+        ],
+        Resource = "*"
+      },
+       {
+        Effect = "Allow",
+        Action = [
+          "codestar-connections:UseConnection",
+          "codestar-connections:GetConnection"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ecs:DescribeServices",
+          "ecs:DescribeTaskDefinition",
+          "ecs:RegisterTaskDefinition",
+          "ecs:UpdateService",
+          "iam:PassRole"
         ],
         Resource = "*"
       }
