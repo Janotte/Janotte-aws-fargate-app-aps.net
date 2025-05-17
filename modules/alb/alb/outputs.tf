@@ -13,3 +13,6 @@ output "listener_arn" {
 output "alb_arn" {
   value = aws_lb.alb.arn
 }
+output "alb_name" {
+  value = aws_lb.alb.name
+}

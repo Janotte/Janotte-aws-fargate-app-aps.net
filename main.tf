@@ -155,16 +155,24 @@ module "codepipeline" {
 
 # Criando o certificado SSL
 module "meusite_cert" {
-  source       = "./modules/meusite_cert"
+  source      = "./modules/meusite_cert"
   domain_name = "${var.project}.${var.domain}"
-  project      = var.project
-  environment  = var.environment
+  project     = var.project
+  environment = var.environment
 }
 
 # Criando o listener SSL
 module "alb_listener" {
-  source            = "./modules/alb_listener"
+  source              = "./modules/alb_listener"
   acm_certificate_arn = module.meusite_cert.acm_certificate_arn
-  alb_arn           = module.alb.alb_arn
-  target_group_arn  = module.alb.target_group_arn
+  alb_arn             = module.alb.alb_arn
+  target_group_arn    = module.alb.target_group_arn
+}
+
+# Criando o alarme de 5xx do ALB
+module "alb_5xx_alarm" {
+  source            = "./modules/cloud_watch/alb_5xx_alarm"
+  alarm_name        = "${var.project}-${var.environment}-alb-5xx-alarm"
+  alarm_description = "Alarme para erros 5xx no ALB"
+  alb_name       = module.alb.alb_name
 }
