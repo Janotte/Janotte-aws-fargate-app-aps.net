@@ -1,6 +1,6 @@
 # Criando a VPC e as subnets
 module "main" {
-  source                = "./modules/vpc"
+  source                = "./modules/vpc/vpc"
   vpc_name              = "${var.project}-${var.environment}-vpc"
   vpc_cidr              = "10.0.0.0/16"
   public_subnet_a_cidr  = "10.0.1.0/24"
@@ -14,7 +14,7 @@ module "main" {
 
 # Criando um grupo de segurança para containers
 module "containers_security_group" {
-  source              = "./modules/security_groups"
+  source              = "./modules/vpc/security_groups"
   security_group_name = "${var.project}-${var.environment}-containers-sg"
   vpc_id              = module.main.vpc_id
   project             = var.project
@@ -23,7 +23,7 @@ module "containers_security_group" {
 
 # Criando o Application Load Balancer, associando as subnets e grupo de segurança
 module "alb" {
-  source            = "./modules/alb"
+  source            = "./modules/alb/alb"
   alb_name          = "${var.project}-${var.environment}-alb"
   subnets           = [module.main.public_subnet_a_id, module.main.public_subnet_b_id]
   security_groups   = [module.containers_security_group.containers_sg_id]
@@ -37,7 +37,7 @@ module "alb" {
 
 # Criando o cluster ECS Fargate
 module "fargate_cluster" {
-  source       = "./modules/fargate"
+  source       = "./modules/ecs/fargate"
   fargate_name = "${var.project}-${var.environment}-cluster"
   project      = var.project
   environment  = var.environment
@@ -45,7 +45,7 @@ module "fargate_cluster" {
 
 # Criando o bucket s3 para os artefatos do build
 module "artifacts_bucket" {
-  source      = "./modules/s3_artifacts"
+  source      = "./modules/s3/artifacts"
   bucket_name = "${var.project}-${var.environment}-artifacts.${var.domain}"
   environment = var.environment
   project     = var.project
@@ -53,7 +53,7 @@ module "artifacts_bucket" {
 
 # Criando a conexão com o GitHub
 module "github_connection" {
-  source          = "./modules/github_connection"
+  source          = "./modules/dev_tools/github_connection"
   connection_name = "github-connection"
   github_provider = "GitHub"
 
@@ -61,7 +61,7 @@ module "github_connection" {
 
 # Criando um repositório ECR 
 module "ecr_repository" {
-  source          = "./modules/ecr_repository"
+  source          = "./modules/ecr/repository"
   repository_name = "${var.project}-${var.environment}-ecr-repository"
   project         = var.project
   environment     = var.environment
@@ -83,7 +83,7 @@ module "iam" {
 
 # Criando o CodeBuild
 module "codebuild" {
-  source                  = "./modules/codebuild"
+  source                  = "./modules/dev_tools/codebuild"
   codebuild_name          = "${var.project}-${var.environment}-codebuild"
   codebuild_role_arn      = module.iam.codebuild_role_arn
   github_owner            = var.github_owner
@@ -105,7 +105,7 @@ module "codebuild" {
 
 # Criando Task Definition com imagem e role
 module "ecs_task_definition" {
-  source             = "./modules/ecs_task_definition"
+  source             = "./modules/ecs/task_definition"
   family_name        = "${var.project}-${var.environment}-fargate-task"
   cpu                = "256"
   memory             = "512"
@@ -117,7 +117,7 @@ module "ecs_task_definition" {
 
 # Criando o ECS Service com ALB e cluster
 module "ecs_service" {
-  source              = "./modules/ecs_service"
+  source              = "./modules/ecs/service"
   service_name        = "${var.project}-${var.environment}-ecs-service"
   container_name      = "${var.project}-${var.environment}-container"
   cluster_id          = module.fargate_cluster.cluster_id
@@ -132,7 +132,7 @@ module "ecs_service" {
 
 # Criando o CodePipeline
 module "codepipeline" {
-  source                = "./modules/codepipeline"
+  source                = "./modules/dev_tools/codepipeline"
   codepipeline_name     = "${var.project}-${var.environment}-codepipeline"
   codepipeline_role_arn = module.iam.codepipeline_role_arn
 
@@ -155,7 +155,7 @@ module "codepipeline" {
 
 # Criando o certificado SSL
 module "meusite_cert" {
-  source      = "./modules/meusite_cert"
+  source      = "./modules/certificate_manager/meusite_cert"
   domain_name = "${var.project}.${var.domain}"
   project     = var.project
   environment = var.environment
@@ -163,7 +163,7 @@ module "meusite_cert" {
 
 # Criando o listener SSL
 module "alb_listener" {
-  source              = "./modules/alb_listener"
+  source              = "./modules/alb/listener_https"
   acm_certificate_arn = module.meusite_cert.acm_certificate_arn
   alb_arn             = module.alb.alb_arn
   target_group_arn    = module.alb.target_group_arn
