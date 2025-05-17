@@ -1,4 +1,4 @@
-# Criando a VPC e as subnets
+# Criando a VPC, Subnets, Internet Gateway, Network ACL e Tabelas de Rotas
 module "main" {
   source                = "./modules/vpc/vpc"
   vpc_name              = "${var.project}-${var.environment}-vpc"
@@ -12,7 +12,7 @@ module "main" {
   environment           = var.environment
 }
 
-# Criando um grupo de segurança para containers
+# Criando um Grupo de Segurança para containers
 module "containers_security_group" {
   source              = "./modules/vpc/security_groups"
   security_group_name = "${var.project}-${var.environment}-containers-sg"
@@ -67,7 +67,7 @@ module "ecr_repository" {
   environment     = var.environment
 }
 
-# Criando a Role para o CodeBuild
+# Criando as Roles para o CodeBuild e CodePipeline
 module "iam" {
   source                       = "./modules/iam"
   codebuild_role_name          = "${var.project}-${var.environment}-codebuild-service-role"
@@ -103,7 +103,7 @@ module "codebuild" {
   environment = var.environment
 }
 
-# Criando Task Definition com imagem e role
+# Criando a Task Definition com imagem e role
 module "ecs_task_definition" {
   source             = "./modules/ecs/task_definition"
   family_name        = "${var.project}-${var.environment}-fargate-task"
@@ -161,7 +161,7 @@ module "meusite_cert" {
   environment = var.environment
 }
 
-# Criando o listener SSL
+# Criando o listener HTTPS do ALB
 module "alb_listener" {
   source              = "./modules/alb/listener_https"
   acm_certificate_arn = module.meusite_cert.acm_certificate_arn
@@ -169,7 +169,7 @@ module "alb_listener" {
   target_group_arn    = module.alb.target_group_arn
 }
 
-# Criando o alarme de 5xx do ALB
+# Criando um alarme de 5xx do ALB
 module "alb_5xx_alarm" {
   source            = "./modules/cloud_watch/alb_5xx_alarm"
   alarm_name        = "Respostas HTTP 5xx no ALB"
@@ -177,7 +177,7 @@ module "alb_5xx_alarm" {
   alb_name       = module.alb.alb_name
 }
 
-# Criando o alarme de CPU do ECS
+# Criando um alarme de uso de CPU do ECS
 module "ecs_cpu_alarm" {
   source            = "./modules/cloud_watch/cpu_alarm"
   alarm_name        = "Uso de CPU no ECS"
@@ -186,7 +186,7 @@ module "ecs_cpu_alarm" {
   service_name      = module.ecs_service.service_name
 }
 
-# Criando o alarme de memória do ECS 
+# Criando um alarme de uso de memória do ECS 
 module "ecs_memory_alarm" {
   source            = "./modules/cloud_watch/memory_alarm"
   alarm_name        = "Uso de memória no ECS"
